@@ -1,40 +1,71 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Mirrorbooth</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mirrorbooth</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+  </head>
+  <body>
+    <div id="pantalla-inicial">
+      <h1>Toque el botón para comenzar</h1>
+      <button id="btn-comenzar">Tomar foto</button>
+    </div>
 
-  <div id="pantalla-inicial">
-    <h1>Toque el botón para comenzar</h1>
-    <button id="btn-comenzar">Comenzar</button>
-  </div>
+    <div id="pantalla-cuenta-regresiva" style="display: none">
+      <h1>Prepárate en <span id="cuenta">5</span> segundos</h1>
+    </div>
 
-  <div id="pantalla-cuenta-regresiva" style="display:none;">
-    <h1>Prepárate en <span id="cuenta">5</span> segundos</h1>
-  </div>
+    <div id="pantalla-captura" style="display: none">
+      <video id="video" autoplay playsinline></video>
+    </div>
 
-  <div id="pantalla-captura" style="display:none;">
-    <video id="video" autoplay playsinline></video>
-  </div>
+    <div id="pantalla-edicion" style="display: none">
+      <canvas id="canvas-edicion"></canvas>
+      <button id="btn-finalizar">Finalizar</button>
+    </div>
 
-  <div id="pantalla-edicion" style="display:none;">
-    <canvas id="canvas-edicion"></canvas>
-    <button id="btn-agregar-texto">Agregar texto</button>
-    <button id="btn-finalizar">Finalizar</button>
-  </div>
+    <label for="color-lapiz">Color del lápiz:</label>
+    <input type="color" id="color-lapiz" value="#ff0000" />
 
-  <div>
-  <label for="color-texto">Color:</label>
-  <input type="color" id="color-texto" value="#ff0000">
+    <label for="grosor-lapiz">Grosor:</label>
+    <input type="number" id="grosor-lapiz" min="1" max="50" value="5" />
 
-  <label for="tamano-texto">Tamaño:</label>
-  <input type="number" id="tamano-texto" value="32" min="10" max="100">
-</div>
+    <!-- Checkboxes -->
+    <label
+      ><input type="checkbox" id="chk-foto" checked /> habilitar tomar
+      foto</label
+    >
+    <label
+      ><input type="checkbox" id="chk-audio" checked /> habilitar grabar
+      audio</label
+    >
+    <label
+      ><input type="checkbox" id="chk-video" checked /> habilitar grabar
+      video</label
+    >
 
+    <!-- Botones -->
+    <div id="modulos">
+      <button id="btn-foto">Tomar foto</button>
+      <button id="btn-audio">Grabá un mensaje de audio</button>
+      <button id="btn-video">Grabá un video mensaje</button>
+    </div>
 
-  <script src="script.js"></script>
-</body>
+    <!-- Controles dinámicos para grabación -->
+    <div id="grabacion-controls" style="display: none">
+      <button id="btn-pausa">Pausar</button>
+      <button id="btn-stop">Stop</button>
+      <div id="contador" style="font-weight: bold"></div>
+    </div>
+
+    <!-- Reproducción -->
+    <div id="preview-container" style="display: none">
+      <audio id="audio-preview" controls></audio>
+      <video id="video-preview" controls></video>
+      <button id="btn-guardar-media">Guardar</button>
+      <button id="btn-borrar-media">Borrar</button>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
 </html>
