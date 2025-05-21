@@ -1,267 +1,395 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mirrorbooth - Foto y Vídeo</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <title>Photo Booth Fidelio</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f0f0f0;
-        text-align: center;
-        touch-action: manipulation;
-      }
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      h1 {
-        color: #333;
-        margin-bottom: 30px;
-      }
-      button {
-        background-color: #4CAF50;
-        border: none;
-        color: white;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 20px;
-        margin: 10px;
-        cursor: pointer;
-        border-radius: 8px;
-        transition: background-color 0.3s;
-      }
-      button:hover {
-        background-color: #45a049;
-      }
-      #btn-comenzar {
-        font-size: 32px;
-        padding: 20px 40px;
-        background-color: #ff4081;
-      }
-      #btn-comenzar:hover {
-        background-color: #e91e63;
-      }
-      #pantalla-inicial {
-        padding: 40px;
-      }
-      #pantalla-cuenta-regresiva {
-        font-size: 72px;
-        padding: 40px;
-      }
-      #cuenta {
-        font-size: 120px;
-        display: block;
-        margin: 40px 0;
-        color: #e91e63;
-      }
-      #pantalla-captura {
-        position: relative;
-        width: 100%;
-      }
-      #video {
-        width: 100%;
-        max-height: 80vh;
-        background-color: #000;
-      }
-      #pantalla-edicion {
-        width: 100%;
-      }
-      #canvas-edicion {
-        max-width: 100%;
-        margin: 0 auto;
-        border: 1px solid #ddd;
-        background-color: #fff;
-      }
-      .controls {
-        margin: 20px 0;
-        padding: 10px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      }
-      input[type="color"] {
-        width: 50px;
-        height: 50px;
-        padding: 0;
-        border: none;
-        cursor: pointer;
-      }
-      input[type="number"] {
-        width: 60px;
-        height: 30px;
-        font-size: 16px;
-      }
-      label {
-        font-size: 18px;
-        margin: 0 10px;
-      }
-      .modulos-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20px;
-        margin: 30px 0;
-      }
-      .modulos-container button {
-        min-width: 200px;
-      }
-      #btn-foto {
-        background-color: #2196F3;
-      }
-      #btn-foto:hover {
-        background-color: #0b7dda;
-      }
-      #btn-audio {
-        background-color: #9C27B0;
-      }
-      #btn-audio:hover {
-        background-color: #7B1FA2;
-      }
-      #btn-video {
-        background-color: #FF5722;
-      }
-      #btn-video:hover {
-        background-color: #E64A19;
-      }
-      #grabacion-controls {
-        position: fixed;
-        bottom: 20px;
-        left: 0;
-        right: 0;
-        background-color: rgba(0,0,0,0.7);
-        padding: 15px;
-        color: white;
-      }
-      #contador {
-        font-size: 24px;
-        margin: 10px 0;
-      }
-      #preview-container {
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        margin: 20px auto;
-        max-width: 800px;
-      }
-      #preview-container video,
-      #preview-container audio {
-        width: 100%;
-        margin: 20px 0;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .media-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        video, canvas {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .media-item {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .media-item img, .media-item video, .media-item audio {
+            width: 100%;
+            display: block;
+        }
+        .media-info {
+            padding: 5px;
+            text-align: center;
+            font-size: 14px;
+            background-color: #f9f9f9;
+        }
+        #statusMessage {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
-      <!-- Pantalla Inicial -->
-      <div id="pantalla-inicial">
-        <h1>¡Photobooth de Cumpleaños!</h1>
-        <p>Bienvenido al photobooth interactivo. Deja un recuerdo para la cumpleañera.</p>
-        <button id="btn-comenzar">Comenzar</button>
-      </div>
-
-      <!-- Pantalla Cuenta Regresiva -->
-      <div id="pantalla-cuenta-regresiva" style="display: none">
-        <h1>Prepárate en</h1>
-        <span id="cuenta">5</span>
-        <p>segundos</p>
-      </div>
-
-      <!-- Pantalla Captura -->
-      <div id="pantalla-captura" style="display: none">
-        <video id="video" autoplay playsinline></video>
-      </div>
-
-      <!-- Pantalla Edición -->
-      <div id="pantalla-edicion" style="display: none">
-        <h2>¡Ahora puedes dibujar algo con el dedo!</h2>
+        <h1>Photo Booth Fidelio</h1>
+        
+        <div class="media-container">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+        </div>
         
         <div class="controls">
-          <label for="color-lapiz">Color del lápiz:</label>
-          <input type="color" id="color-lapiz" value="#ff0000" />
-          
-          <label for="grosor-lapiz">Grosor:</label>
-          <input type="number" id="grosor-lapiz" min="1" max="50" value="5" />
+            <button id="startCamera">Iniciar Cámara</button>
+            <button id="takePhoto" disabled>Tomar Foto</button>
+            <button id="startRecording" disabled>Grabar Video</button>
+            <button id="stopRecording" disabled>Detener Video</button>
+            <button id="startAudio" disabled>Grabar Audio</button>
+            <button id="stopAudio" disabled>Detener Audio</button>
         </div>
         
-        <canvas id="canvas-edicion"></canvas>
+        <div id="statusMessage"></div>
         
-        <button id="btn-finalizar">Guardar mi foto</button>
-      </div>
-
-      <!-- Selección de Módulos -->
-      <div id="modulos" style="display: none">
-        <h1>¿Qué quieres hacer?</h1>
-        
-        <div class="controls">
-          <label><input type="checkbox" id="chk-foto" checked /> Activar foto</label>
-          <label><input type="checkbox" id="chk-audio" checked /> Activar audio</label>
-          <label><input type="checkbox" id="chk-video" checked /> Activar video</label>
-        </div>
-        
-        <div class="modulos-container">
-          <button id="btn-foto">Tomar una foto</button>
-          <button id="btn-audio">Grabar mensaje de audio</button>
-          <button id="btn-video">Grabar video saludo</button>
-        </div>
-      </div>
-
-      <!-- Configuración de WordPress -->
-      <div id="wp-config" style="display: none; text-align: left; margin-top: 20px;">
-        <h3>Configuración de WordPress</h3>
-        <div class="controls">
-          <label for="wp-enable">
-            <input type="checkbox" id="wp-enable"> Habilitar publicación en WordPress
-          </label>
-        </div>
-        
-        <div id="wp-settings" style="display: none; padding: 10px; background-color: #f9f9f9; border-radius: 5px; margin-top: 10px;">
-          <div style="margin: 10px 0;">
-            <label for="wp-url">URL del sitio WordPress:</label>
-            <input type="url" id="wp-url" style="width: 100%; padding: 8px; margin-top: 5px;" 
-                  placeholder="https://tusitio.com">
-          </div>
-          <div style="margin: 10px 0;">
-            <label for="wp-user">Usuario:</label>
-            <input type="text" id="wp-user" style="width: 100%; padding: 8px; margin-top: 5px;" 
-                  placeholder="usuario">
-          </div>
-          <div style="margin: 10px 0;">
-            <label for="wp-app-password">Contraseña de aplicación:</label>
-            <input type="password" id="wp-app-password" 
-                  style="width: 100%; padding: 8px; margin-top: 5px;" placeholder="xxxx xxxx xxxx xxxx">
-            <small style="display: block; margin-top: 5px; color: #666;">Nota: Necesitas crear una contraseña de aplicación en WordPress para esto.</small>
-          </div>
-          <button id="btn-guardar-wp-config">Guardar configuración</button>
-        </div>
-      </div>
-      
-      <!-- Controles para grabación -->
-      <div id="grabacion-controls" style="display: none">
-        <div id="contador">00:00</div>
-        <button id="btn-pausa">Pausar</button>
-        <button id="btn-stop">Terminar</button>
-      </div>
-
-      <!-- Contenedor de previsualización -->
-      <div id="preview-container" style="display: none">
-        <h2>¡Tu grabación está lista!</h2>
-        <audio id="audio-preview" controls style="display: none;"></audio>
-        <video id="video-preview" controls style="display: none;"></video>
-        <div>
-          <button id="btn-guardar-media">Guardar</button>
-          <button id="btn-borrar-media">Borrar y volver</button>
-        </div>
-      </div>
+        <h2>Galería</h2>
+        <div class="gallery" id="gallery"></div>
     </div>
-
-    <script src="script.js"></script>
-  </body>
+    
+    <script>
+        // Variables globales
+        let videoStream;
+        let mediaRecorder;
+        let audioRecorder;
+        let recordedChunks = [];
+        let audioChunks = [];
+        
+        // Elementos DOM
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const startCameraBtn = document.getElementById('startCamera');
+        const takePhotoBtn = document.getElementById('takePhoto');
+        const startRecordingBtn = document.getElementById('startRecording');
+        const stopRecordingBtn = document.getElementById('stopRecording');
+        const startAudioBtn = document.getElementById('startAudio');
+        const stopAudioBtn = document.getElementById('stopAudio');
+        const gallery = document.getElementById('gallery');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        // Iniciar la cámara
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                });
+                
+                video.srcObject = videoStream;
+                
+                // Habilitar botones
+                startCameraBtn.disabled = true;
+                takePhotoBtn.disabled = false;
+                startRecordingBtn.disabled = false;
+                startAudioBtn.disabled = false;
+                
+                showStatus('Cámara iniciada correctamente', 'success');
+            } catch (error) {
+                console.error('Error al acceder a la cámara:', error);
+                showStatus('Error al acceder a la cámara: ' + error.message, 'error');
+            }
+        });
+        
+        // Tomar foto
+        takePhotoBtn.addEventListener('click', () => {
+            // Configurar canvas con dimensiones del video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Dibujar el frame actual del video en el canvas
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convertir a base64
+            const imageData = canvas.toDataURL('image/png');
+            
+            // Enviar al servidor
+            saveMedia('/save-photo', { imageData }, 'foto');
+        });
+        
+        // Iniciar grabación de video
+        startRecordingBtn.addEventListener('click', async () => {
+            recordedChunks = [];
+            
+            try {
+                // Obtener acceso a video y audio para la grabación
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                video.srcObject = stream;
+                videoStream = stream;
+                
+                // Crear el MediaRecorder
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm'
+                });
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                    
+                    // Convertir a base64
+                    const reader = new FileReader();
+                    reader.readAsDataURL(videoBlob);
+                    reader.onloadend = () => {
+                        const videoData = reader.result;
+                        saveMedia('/save-video', { videoData }, 'video');
+                    };
+                    
+                    // Restaurar la cámara normal
+                    restartCamera();
+                };
+                
+                // Iniciar grabación
+                mediaRecorder.start();
+                
+                // Actualizar UI
+                startRecordingBtn.disabled = true;
+                stopRecordingBtn.disabled = false;
+                takePhotoBtn.disabled = true;
+                startAudioBtn.disabled = true;
+                
+                showStatus('Grabando video...', 'success');
+            } catch (error) {
+                console.error('Error al iniciar la grabación de video:', error);
+                showStatus('Error al iniciar la grabación de video: ' + error.message, 'error');
+            }
+        });
+        
+        // Detener grabación de video
+        stopRecordingBtn.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                
+                // Actualizar UI
+                stopRecordingBtn.disabled = true;
+                showStatus('Procesando video...', 'success');
+            }
+        });
+        
+        // Iniciar grabación de audio
+        startAudioBtn.addEventListener('click', async () => {
+            audioChunks = [];
+            
+            try {
+                const audioStream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: false
+                });
+                
+                audioRecorder = new MediaRecorder(audioStream);
+                
+                audioRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                audioRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    
+                    // Convertir a base64
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        const audioData = reader.result;
+                        saveMedia('/save-audio', { audioData }, 'audio');
+                    };
+                };
+                
+                // Iniciar grabación
+                audioRecorder.start();
+                
+                // Actualizar UI
+                startAudioBtn.disabled = true;
+                stopAudioBtn.disabled = false;
+                startRecordingBtn.disabled = true;
+                
+                showStatus('Grabando audio...', 'success');
+            } catch (error) {
+                console.error('Error al iniciar la grabación de audio:', error);
+                showStatus('Error al iniciar la grabación de audio: ' + error.message, 'error');
+            }
+        });
+        
+        // Detener grabación de audio
+        stopAudioBtn.addEventListener('click', () => {
+            if (audioRecorder && audioRecorder.state !== 'inactive') {
+                audioRecorder.stop();
+                
+                // Actualizar UI
+                stopAudioBtn.disabled = true;
+                startAudioBtn.disabled = false;
+                startRecordingBtn.disabled = false;
+                
+                showStatus('Procesando audio...', 'success');
+            }
+        });
+        
+        // Función para guardar medios en el servidor
+        async function saveMedia(endpoint, data, type) {
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus(`${type.charAt(0).toUpperCase() + type.slice(1)} guardado correctamente`, 'success');
+                    addToGallery(result.path, type, result.filename);
+                } else {
+                    showStatus(`Error al guardar ${type}: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                console.error(`Error al guardar ${type}:`, error);
+                showStatus(`Error al guardar ${type}: ${error.message}`, 'error');
+            }
+        }
+        
+        // Función para mostrar mensajes de estado
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = type;
+            
+            // Limpiar el mensaje después de 5 segundos
+            setTimeout(() => {
+                statusMessage.textContent = '';
+                statusMessage.className = '';
+            }, 5000);
+        }
+        
+        // Función para agregar elementos a la galería
+        function addToGallery(path, type, filename) {
+            const mediaItem = document.createElement('div');
+            mediaItem.className = 'media-item';
+            
+            let mediaElement;
+            
+            if (type === 'foto') {
+                mediaElement = document.createElement('img');
+                mediaElement.src = path;
+                mediaElement.alt = filename;
+            } else if (type === 'video') {
+                mediaElement = document.createElement('video');
+                mediaElement.src = path;
+                mediaElement.controls = true;
+            } else if (type === 'audio') {
+                mediaElement = document.createElement('audio');
+                mediaElement.src = path;
+                mediaElement.controls = true;
+            }
+            
+            const mediaInfo = document.createElement('div');
+            mediaInfo.className = 'media-info';
+            mediaInfo.textContent = filename;
+            
+            mediaItem.appendChild(mediaElement);
+            mediaItem.appendChild(mediaInfo);
+            
+            gallery.insertBefore(mediaItem, gallery.firstChild);
+        }
+        
+        // Función para reiniciar la cámara después de grabar video
+        async function restartCamera() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+            
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                });
+                
+                video.srcObject = videoStream;
+                
+                // Habilitar botones
+                takePhotoBtn.disabled = false;
+                startRecordingBtn.disabled = false;
+                startAudioBtn.disabled = false;
+            } catch (error) {
+                console.error('Error al reiniciar la cámara:', error);
+                showStatus('Error al reiniciar la cámara: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
 </html>
